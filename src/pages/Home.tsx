@@ -27,7 +27,7 @@ export function Home() {
         {/* Seção de Planos - agora o usuário chega aqui após ser convencido pelas seções acima */}
         <section id="precos" className="space-y-8">
           <PlanGrid title="Planos Pessoais (CPF)" type="personal" />
-          <PlanGrid title="Planos Empresariais (CNPJ)" type="business" />
+          <PlanGrid title="Planos Empresariais (CNPJ) - Acima de 10 Vidas" type="business" />
         </section>
 
         {/* Blocos de Conteúdo e Conversão */}

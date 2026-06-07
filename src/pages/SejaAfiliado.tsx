@@ -29,7 +29,7 @@ export function SejaAfiliado() {
         {/* CTA HERO */}
         <div className="mt-10">
           <Link
-            to="/cadastro" // Substitua pela rota do seu novo cadastro
+            to="/inscricao-colaborador"
             className="inline-flex items-center justify-center bg-[#22C55E] hover:bg-[#16a34a] text-white px-14 py-6 md:px-20 rounded-full shadow-[0_18px_40px_rgba(0,0,0,0.35)] transition-all duration-300 transform hover:scale-105 active:scale-95 border-b-4 border-green-800 text-xl md:text-2xl font-black"
           >
             Quero me cadastrar agora
@@ -82,7 +82,7 @@ export function SejaAfiliado() {
           Comece hoje a construir sua rede de vendas
         </h2>
         <Link
-          to="/cadastro"
+          to="/inscricao-colaborador"
           className="inline-block bg-white text-green-700 px-16 py-6 rounded-full text-2xl font-black shadow-2xl hover:scale-105 transition-transform"
         >
           Quero me cadastrar agora
