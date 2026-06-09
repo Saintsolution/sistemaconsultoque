@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
-function formatId(value: any) {
+function formatCod(value: any) {
   if (value === null || value === undefined || value === '') return '';
   return String(value).replace(/\D/g, '').padStart(4, '0');
 }
@@ -13,54 +13,29 @@ function dinheiro(valor: any) {
   });
 }
 
-function parseDataBR(data: string) {
-  if (!data) return null;
-  const [dia, mes, ano] = data.split('/');
-  return new Date(Number(ano), Number(mes) - 1, Number(dia));
-}
-
-function formatarData(data: Date | null) {
-  if (!data) return '-';
-  return data.toLocaleDateString('pt-BR');
-}
-
-function proximoVencimento(dataVenda: string) {
-  const data = parseDataBR(dataVenda);
-  if (!data) return '-';
-
-  const hoje = new Date();
-  let venc = new Date(data);
-
-  while (venc < hoje) {
-    venc.setMonth(venc.getMonth() + 1);
-  }
-
-  return formatarData(venc);
-}
-
 export function ColaboradorDashboard() {
   const [logado, setLogado] = useState(false);
   const [loading, setLoading] = useState(false);
-  const [formData, setFormData] = useState({ cpf: '', senha: '' });
+  const [formData, setFormData] = useState({ cpf_colab: '', senha_login: '' });
   const [dados, setDados] = useState<any>(null);
   const [aberto, setAberto] = useState<string | null>('vendas');
 
   useEffect(() => {
-    const id = localStorage.getItem('colaborador_id');
+    const cod = localStorage.getItem('cod_colab');
 
-    if (id) {
+    if (cod) {
       setLogado(true);
-      buscarDados(id);
+      buscarDados(cod);
     }
   }, []);
 
-  const buscarDados = async (id: string) => {
+  const buscarDados = async (cod: string) => {
     setLoading(true);
 
     try {
       const response = await axios.post(
         'https://n8n.saintsolution.com.br/webhook/get-dados-colaborador',
-        { id_colab: formatId(id) },
+        { cod_colab: formatCod(cod) },
         { timeout: 15000 }
       );
 
@@ -82,19 +57,22 @@ export function ColaboradorDashboard() {
 
     try {
       const response = await axios.post(
-        'https://n8n.saintsolution.com.br/webhook/2f881232-b395-4241-be00-1dbf6573118a',
-        formData,
+        'https://n8n.saintsolution.com.br/webhook/login_dash_colab',
+        {
+          cpf_colab: formData.cpf_colab,
+          senha_login: formData.senha_login,
+        },
         { timeout: 15000 }
       );
 
       if (response.data.status === 'sucesso') {
-        const idFormatado = formatId(response.data.id);
+        const codFormatado = formatCod(response.data.cod_colab);
 
-        localStorage.setItem('colaborador_id', idFormatado);
-        localStorage.setItem('colaborador_nome', response.data.nome || '');
+        localStorage.setItem('cod_colab', codFormatado);
+        localStorage.setItem('nome_colab', response.data.nome_colab || '');
 
         setLogado(true);
-        await buscarDados(idFormatado);
+        await buscarDados(codFormatado);
       } else {
         alert('CPF ou senha incorretos.');
       }
@@ -110,26 +88,26 @@ export function ColaboradorDashboard() {
     return (
       <div className="min-h-screen flex items-center justify-center bg-slate-100 p-4">
         <div className="p-8 bg-white rounded-2xl shadow-xl w-full max-w-sm">
-          <h2 className="text-xl font-bold mb-6 text-center">Acesso Consultor</h2>
+          <h2 className="text-xl font-bold mb-6 text-center">Acesso Colaborador</h2>
 
           <input
             className="w-full p-3 mb-4 border rounded-lg"
             placeholder="CPF"
-            value={formData.cpf}
-            onChange={(e) => setFormData({ ...formData, cpf: e.target.value })}
+            value={formData.cpf_colab}
+            onChange={(e) => setFormData({ ...formData, cpf_colab: e.target.value })}
           />
 
           <input
             className="w-full p-3 mb-6 border rounded-lg"
             type="password"
             placeholder="Senha"
-            value={formData.senha}
-            onChange={(e) => setFormData({ ...formData, senha: e.target.value })}
+            value={formData.senha_login}
+            onChange={(e) => setFormData({ ...formData, senha_login: e.target.value })}
           />
 
           <button
             className={`w-full p-3 font-bold rounded-lg text-white ${
-              loading ? 'bg-gray-400' : 'bg-blue-700'
+              loading ? 'bg-gray-400' : 'bg-blue-700 hover:bg-blue-800'
             }`}
             onClick={handleLogin}
             disabled={loading}
@@ -149,40 +127,34 @@ export function ColaboradorDashboard() {
     );
   }
 
-  const idLogado = formatId(dados.idLogado);
+  const codLogado = formatCod(dados.cod_colab || localStorage.getItem('cod_colab'));
   const vendas = dados.vendas || [];
-  const beneficiarios = dados.beneficiarios || [];
+  const titulares = dados.titulares || [];
   const colaboradores = dados.colaboradores || [];
+  const comissoes = dados.comissoes || [];
 
-  const vendasPessoais = vendas.filter(
-    (v: any) => formatId(v.id_indicador) === idLogado
-  );
-
-  const vendasRede = vendas.filter(
-    (v: any) => formatId(v.id_indicador) !== idLogado
-  );
-
-  const valorTotalVendas = vendas.reduce(
-    (acc: number, v: any) => acc + Number(v.valor_mensalidade || 0),
+  const totalVendas = vendas.reduce(
+    (acc: number, v: any) => acc + Number(v.vl_total || 0),
     0
   );
 
-  const valorVendasPessoais = vendasPessoais.reduce(
-    (acc: number, v: any) => acc + Number(v.valor_mensalidade || 0),
+  const comissoesPendentes = comissoes.filter(
+    (c: any) => String(c.status_comissao || '').toLowerCase() === 'pendente'
+  );
+
+  const comissoesPagas = comissoes.filter(
+    (c: any) => String(c.status_comissao || '').toLowerCase() === 'paga'
+  );
+
+  const totalAReceber = comissoesPendentes.reduce(
+    (acc: number, c: any) => acc + Number(c.vl_comissao || 0),
     0
   );
 
-  const comissaoDireta = vendasPessoais.reduce(
-    (acc: number, v: any) => acc + Number(v.valor_mensalidade || 0) * 0.5,
+  const totalRecebido = comissoesPagas.reduce(
+    (acc: number, c: any) => acc + Number(c.vl_comissao || 0),
     0
   );
-
-  const comissaoRede = vendasRede.reduce(
-    (acc: number, v: any) => acc + Number(v.valor_mensalidade || 0) * 0.05,
-    0
-  );
-
-  const comissaoTotal = comissaoDireta + comissaoRede;
 
   const Toggle = ({ id, titulo, children }: any) => (
     <div className="bg-white rounded-xl shadow border border-slate-200 mb-6 overflow-hidden">
@@ -202,97 +174,110 @@ export function ColaboradorDashboard() {
     <div className="min-h-screen p-8 bg-slate-50">
       <div className="flex justify-between items-center mb-8">
         <div>
+          <p className="text-sm font-semibold text-blue-700 mb-1">
+            Que bom te ver por aqui!
+          </p>
+
           <h1 className="text-2xl font-black">
-            Olá, {localStorage.getItem('colaborador_nome')}
+            Olá, {localStorage.getItem('nome_colab') || 'colaborador'}
           </h1>
-          <p className="text-sm text-slate-500">ID: {idLogado}</p>
+
+          <p className="text-sm text-slate-500 mt-1">
+            Seu código de colaborador: <strong>{codLogado}</strong>
+          </p>
         </div>
 
-        <button
-          className="text-sm text-red-600 underline"
-          onClick={() => {
-            localStorage.clear();
-            window.location.reload();
-          }}
-        >
-          Sair
-        </button>
+        <div className="flex items-center gap-4">
+          <a href="/" className="text-sm text-blue-700 underline font-semibold">
+            Início do Site
+          </a>
+
+          <button
+            className="text-sm text-red-600 underline"
+            onClick={() => {
+              localStorage.clear();
+              window.location.href = '/';
+            }}
+          >
+            Sair
+          </button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
         <Card titulo="Vendas Realizadas" valor={vendas.length} />
-        <Card titulo="Beneficiários" valor={beneficiarios.length} />
+        <Card titulo="Titulares" valor={titulares.length} />
         <Card titulo="Colaboradores na Rede" valor={colaboradores.length} />
-        <Card titulo="Comissão Estimada" valor={dinheiro(comissaoTotal)} destaque />
+        <Card titulo="A Receber" valor={dinheiro(totalAReceber)} destaque />
       </div>
 
       <Toggle id="vendas" titulo="Vendas realizadas">
         <Tabela
-          colunas={['OS', 'Cliente', 'CPF pagador', 'Telefone', 'Plano', 'Vencimento', 'Valor']}
+          colunas={['Contrato', 'Data', 'Associado', 'CPF Pagador', 'Tipo Plano', 'Tit. Ind', 'Tit. Fam', 'Valor', 'Status']}
           linhas={vendas.map((v: any) => [
-            v.os,
-            v.cliente_nome,
-            v.cpf,
-            v.telefone_cliente,
-            v.cod_plano,
-            proximoVencimento(v.data),
-            dinheiro(v.valor_mensalidade),
+            v.num_contrato,
+            v.dt_venda,
+            v.assoc_nome,
+            v.assoc_cpf,
+            v.tipo_plano,
+            v.tit_ind,
+            v.tit_fam,
+            dinheiro(v.vl_total),
+            v.status_venda,
           ])}
         />
       </Toggle>
 
-      <Toggle id="beneficiarios" titulo="Beneficiários vinculados">
+      <Toggle id="titulares" titulo="Titulares vinculados">
         <Tabela
-          colunas={['Registro', 'Beneficiário', 'CPF Beneficiário', 'CPF Responsável', 'E-mail', 'Telefone', 'Status']}
-          linhas={beneficiarios.map((b: any) => [
-            b.num_registro,
-            b.nome_benef,
-            b.cpf_benef,
-            b.cpf_responsavel,
-            b['e-mail'],
-            b.telefone,
-            b.status,
+          colunas={['Contrato', 'Titular', 'CPF', 'E-mail', 'Telefone', 'Código Plano', 'Status']}
+          linhas={titulares.map((t: any) => [
+            t.num_contrato,
+            t.tit_nome,
+            t.tit_cpf,
+            t.tit_email,
+            t.tit_tel,
+            t.cod_plano,
+            t.status_titular,
           ])}
         />
       </Toggle>
 
       <Toggle id="rede" titulo="Colaboradores na rede">
         <Tabela
-          colunas={['ID', 'Nome', 'E-mail', 'Telefone', 'ID Pai', 'CPF']}
+          colunas={['Código', 'Nome', 'E-mail', 'Telefone', 'Código Pai', 'CPF']}
           linhas={colaboradores.map((c: any) => [
-            formatId(c.id_indicador),
+            formatCod(c.cod_colab),
             c.nome_colab,
             c.email_colab,
-            c.telefone_colab,
-            formatId(c.id_pai),
-            c.cpf,
+            c.tel_colab,
+            formatCod(c.cod_pai),
+            c.cpf_colab,
           ])}
         />
       </Toggle>
 
       <Toggle id="comissoes" titulo="Comissões e valores">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-4 mb-6">
-          <Card titulo="Valor total em vendas" valor={dinheiro(valorTotalVendas)} />
-          <Card titulo="Vendas pessoais" valor={dinheiro(valorVendasPessoais)} />
-          <Card titulo="Comissão direta" valor={dinheiro(comissaoDireta)} />
-          <Card titulo="Comissão da rede" valor={dinheiro(comissaoRede)} />
+          <Card titulo="Valor total em vendas" valor={dinheiro(totalVendas)} />
+          <Card titulo="Comissões geradas" valor={comissoes.length} />
+          <Card titulo="Total recebido" valor={dinheiro(totalRecebido)} />
+          <Card titulo="A receber" valor={dinheiro(totalAReceber)} destaque />
         </div>
 
         <Tabela
-          colunas={['Cliente', 'ID Indicador', 'Tipo', 'Valor venda', 'Comissão']}
-          linhas={vendas.map((v: any) => {
-            const propria = formatId(v.id_indicador) === idLogado;
-            const valor = Number(v.valor_mensalidade || 0);
-            const comissao = propria ? valor * 0.5 : valor * 0.05;
-
-            return [
-              v.cliente_nome,
-              formatId(v.id_indicador),
-              propria ? 'Venda pessoal 50%' : 'Rede 5%',
-              dinheiro(valor),
-              dinheiro(comissao),
-            ];
-          })}
+          colunas={['Data', 'Contrato', 'Tipo Plano', 'Tipo Comissão', 'Base', '%', 'Comissão', 'Status', 'Pagamento']}
+          linhas={comissoes.map((c: any) => [
+            c.dt_comissao,
+            c.num_contrato,
+            c.tipo_plano,
+            c.tipo_comissao,
+            dinheiro(c.vl_base),
+            `${c.perc_comissao || 0}%`,
+            dinheiro(c.vl_comissao),
+            c.status_comissao,
+            c.dt_pagamento || '-',
+          ])}
         />
       </Toggle>
     </div>
