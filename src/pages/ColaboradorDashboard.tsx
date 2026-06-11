@@ -185,6 +185,20 @@ export function ColaboradorDashboard() {
           <p className="text-sm text-slate-500 mt-1">
             Seu código de colaborador: <strong>{codLogado}</strong>
           </p>
+          
+          <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
+            <p className="text-xs font-semibold text-blue-800 uppercase mb-1">
+              Seu link de vendas:
+            </p>
+            <a 
+              href={`https://sistema.consultoque.com.br/${codLogado}`} 
+              target="_blank" 
+              rel="noopener noreferrer"
+              className="text-blue-700 font-bold hover:underline break-all"
+            >
+              https://sistema.consultoque.com.br/{codLogado}
+            </a>
+          </div>
         </div>
 
         <div className="flex items-center gap-4">
