@@ -5,6 +5,8 @@ import { ScrollToTop } from './components/ScrollToTop';
 // Páginas Principais
 import { Home } from './pages/Home';
 import Formulario from './pages/Formulario';
+import { FormIndividual } from './pages/FormIndividual';
+import { FormFamiliar } from './pages/FormFamiliar';
 import { SejaAfiliado } from './pages/SejaAfiliado';
 import { InscricaoColaborador } from './pages/InscricaoColaborador';
 import { Login } from './pages/Login';
@@ -36,6 +38,8 @@ export default function App() {
       'empresa',
       'cliente',
       'inscricao',
+      'form-individual',
+      'form-familiar',
       'inscricao-colaborador',
       'videoafiliados',
     ];
@@ -60,6 +64,10 @@ export default function App() {
       <Routes>
         <Route path="/" element={<Home />} />
         <Route path="/inscricao" element={<Formulario />} />
+
+        <Route path="/form-individual" element={<FormIndividual />} />
+        <Route path="/form-familiar" element={<FormFamiliar />} />
+
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminAsaas />} />
         <Route path="/colaborador" element={<ColaboradorDashboard />} />

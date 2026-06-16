@@ -16,7 +16,9 @@ export function PlanGrid({ type }: PlanGridProps) {
     : 'PLANOS COLETIVOS - ACIMA DE 10 TITULARES';
 
   const borderColor = isPersonal ? 'border-[#3b82f6]' : 'border-[#22c55e]';
-  const buttonColor = isPersonal ? 'bg-[#3b82f6] hover:bg-[#2563eb]' : 'bg-[#22c55e] hover:bg-[#16a34a]';
+  const buttonColor = isPersonal
+    ? 'bg-[#3b82f6] hover:bg-[#2563eb]'
+    : 'bg-[#22c55e] hover:bg-[#16a34a]';
   const accentColor = isPersonal ? 'text-[#3b82f6]' : 'text-[#22c55e]';
 
   return (
@@ -46,7 +48,7 @@ export function PlanGrid({ type }: PlanGridProps) {
           </div>
 
           <Link
-            to={`/inscricao?tipo_plano=${isPersonal ? 'ind_esp_pes' : 'ind_esp_col'}`}
+            to={isPersonal ? '/form-individual' : '/form-coletivo'}
             className={`w-full ${buttonColor} text-white font-black py-3 rounded-xl uppercase text-[11px] tracking-wider transition-all text-center`}
           >
             Contratar Individual
@@ -73,7 +75,7 @@ export function PlanGrid({ type }: PlanGridProps) {
           </div>
 
           <Link
-            to={`/inscricao?tipo_plano=${isPersonal ? 'fam_esp_pes' : 'fam_esp_col'}`}
+            to={isPersonal ? '/form-familiar' : '/form-coletivo'}
             className={`w-full ${buttonColor} text-white font-black py-3 rounded-xl uppercase text-[11px] tracking-wider transition-all text-center`}
           >
             Contratar Familiar
