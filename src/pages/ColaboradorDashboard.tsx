@@ -1,6 +1,9 @@
 import { useState, useEffect } from 'react';
 import axios from 'axios';
 
+const WEBHOOK_UPDATE_COLAB =
+  'https://n8n.saintsolution.com.br/webhook/update-dados-colaborador';
+
 function formatCod(value: any) {
   if (value === null || value === undefined || value === '') return '';
   return String(value).replace(/\D/g, '').padStart(4, '0');
@@ -20,9 +23,16 @@ export function ColaboradorDashboard() {
   const [dados, setDados] = useState<any>(null);
   const [aberto, setAberto] = useState<string | null>('vendas');
 
+  const [editandoDados, setEditandoDados] = useState(false);
+  const [salvandoDados, setSalvandoDados] = useState(false);
+  const [editData, setEditData] = useState({
+    email_colab: '',
+    tel_colab: '',
+    pix_colab: '',
+  });
+
   useEffect(() => {
     const cod = localStorage.getItem('cod_colab');
-
     if (cod) {
       setLogado(true);
       buscarDados(cod);
@@ -31,7 +41,6 @@ export function ColaboradorDashboard() {
 
   const buscarDados = async (cod: string) => {
     setLoading(true);
-
     try {
       const response = await axios.post(
         'https://n8n.saintsolution.com.br/webhook/get-dados-colaborador',
@@ -54,7 +63,6 @@ export function ColaboradorDashboard() {
 
   const handleLogin = async () => {
     setLoading(true);
-
     try {
       const response = await axios.post(
         'https://n8n.saintsolution.com.br/webhook/login_dash_colab',
@@ -128,6 +136,9 @@ export function ColaboradorDashboard() {
   }
 
   const codLogado = formatCod(dados.cod_colab || localStorage.getItem('cod_colab'));
+  const colaboradorLogado = dados.colaborador || {};
+  const codPai = formatCod(colaboradorLogado.cod_pai || '');
+
   const vendas = dados.vendas || [];
   const titulares = dados.titulares || [];
   const colaboradores = dados.colaboradores || [];
@@ -156,6 +167,50 @@ export function ColaboradorDashboard() {
     0
   );
 
+  function abrirEdicaoDados() {
+    setEditData({
+      email_colab: colaboradorLogado.email_colab || '',
+      tel_colab: colaboradorLogado.tel_colab || '',
+      pix_colab: colaboradorLogado.pix_colab || '',
+    });
+    setEditandoDados(true);
+  }
+
+  async function salvarDadosColab() {
+    setSalvandoDados(true);
+
+    try {
+      await axios.post(
+        WEBHOOK_UPDATE_COLAB,
+        {
+          cod_colab: codLogado,
+          email_colab: editData.email_colab,
+          tel_colab: editData.tel_colab,
+          pix_colab: editData.pix_colab,
+        },
+        { timeout: 15000 }
+      );
+
+      setDados((prev: any) => ({
+        ...prev,
+        colaborador: {
+          ...prev.colaborador,
+          email_colab: editData.email_colab,
+          tel_colab: editData.tel_colab,
+          pix_colab: editData.pix_colab,
+        },
+      }));
+
+      setEditandoDados(false);
+      alert('Dados atualizados com sucesso!');
+    } catch (e) {
+      console.error(e);
+      alert('Erro ao atualizar seus dados.');
+    } finally {
+      setSalvandoDados(false);
+    }
+  }
+
   const Toggle = ({ id, titulo, children }: any) => (
     <div className="bg-white rounded-xl shadow border border-slate-200 mb-6 overflow-hidden">
       <button
@@ -172,7 +227,7 @@ export function ColaboradorDashboard() {
 
   return (
     <div className="min-h-screen p-8 bg-slate-50">
-      <div className="flex justify-between items-center mb-8">
+      <div className="flex justify-between items-start mb-8 gap-6">
         <div>
           <p className="text-sm font-semibold text-blue-700 mb-1">
             Que bom te ver por aqui!
@@ -185,20 +240,91 @@ export function ColaboradorDashboard() {
           <p className="text-sm text-slate-500 mt-1">
             Seu código de colaborador: <strong>{codLogado}</strong>
           </p>
-          
+
+          <p className="text-sm text-slate-500 mt-1">
+            Você pertence à célula: <strong>{codPai || '0001'}</strong>
+          </p>
+
+          <button
+            type="button"
+            onClick={abrirEdicaoDados}
+            className="mt-3 text-sm bg-blue-700 text-white px-4 py-2 rounded-lg font-bold hover:bg-blue-800"
+          >
+            Editar meus dados
+          </button>
+
           <div className="mt-4 p-4 bg-blue-50 rounded-lg border border-blue-200">
             <p className="text-xs font-semibold text-blue-800 uppercase mb-1">
               Seu link de vendas:
             </p>
-            <a 
-              href={`https://sistema.consultoque.com.br/${codLogado}`} 
-              target="_blank" 
+            <a
+              href={`https://sistema.consultoque.com.br/${codLogado}`}
+              target="_blank"
               rel="noopener noreferrer"
               className="text-blue-700 font-bold hover:underline break-all"
             >
               https://sistema.consultoque.com.br/{codLogado}
             </a>
           </div>
+
+          {editandoDados && (
+            <div className="mt-4 p-4 bg-white border border-slate-300 rounded-xl shadow-sm max-w-xl">
+              <h3 className="font-black text-gray-900 mb-3">
+                Editar meus dados
+              </h3>
+
+              <div className="space-y-3">
+                <input
+                  type="email"
+                  value={editData.email_colab}
+                  onChange={(e) =>
+                    setEditData({ ...editData, email_colab: e.target.value })
+                  }
+                  className="w-full border rounded-lg p-3"
+                  placeholder="E-mail"
+                />
+
+                <input
+                  type="tel"
+                  value={editData.tel_colab}
+                  onChange={(e) =>
+                    setEditData({ ...editData, tel_colab: e.target.value })
+                  }
+                  className="w-full border rounded-lg p-3"
+                  placeholder="Telefone"
+                />
+
+                <input
+                  type="text"
+                  value={editData.pix_colab}
+                  onChange={(e) =>
+                    setEditData({ ...editData, pix_colab: e.target.value })
+                  }
+                  className="w-full border rounded-lg p-3"
+                  placeholder="Chave Pix"
+                />
+
+                <div className="flex gap-3">
+                  <button
+                    type="button"
+                    onClick={salvarDadosColab}
+                    disabled={salvandoDados}
+                    className="bg-green-600 text-white px-4 py-2 rounded-lg font-bold disabled:opacity-60"
+                  >
+                    {salvandoDados ? 'Salvando...' : 'Salvar'}
+                  </button>
+
+                  <button
+                    type="button"
+                    onClick={() => setEditandoDados(false)}
+                    className="bg-slate-200 text-slate-700 px-4 py-2 rounded-lg font-bold"
+                  >
+                    Cancelar
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         <div className="flex items-center gap-4">

@@ -2,11 +2,11 @@ import { useEffect } from 'react';
 import { Routes, Route } from 'react-router-dom';
 import { ScrollToTop } from './components/ScrollToTop';
 
-// Páginas Principais
 import { Home } from './pages/Home';
-import Formulario from './pages/Formulario';
 import { FormIndividual } from './pages/FormIndividual';
 import { FormFamiliar } from './pages/FormFamiliar';
+import { FormColetivo } from './pages/FormColetivo';
+
 import { SejaAfiliado } from './pages/SejaAfiliado';
 import { InscricaoColaborador } from './pages/InscricaoColaborador';
 import { Login } from './pages/Login';
@@ -37,14 +37,16 @@ export default function App() {
       'colaborador',
       'empresa',
       'cliente',
-      'inscricao',
       'form-individual',
       'form-familiar',
+      'form-coletivo',
       'inscricao-colaborador',
       'videoafiliados',
     ];
 
-    const isRefPath = path && !isNaN(Number(path)) && !rotasExistentes.includes(path);
+    const isRefPath =
+      path && !isNaN(Number(path)) && !rotasExistentes.includes(path);
+
     const finalRef = refParam || (isRefPath ? path : null);
 
     if (finalRef) {
@@ -63,10 +65,10 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Home />} />
-        <Route path="/inscricao" element={<Formulario />} />
 
         <Route path="/form-individual" element={<FormIndividual />} />
         <Route path="/form-familiar" element={<FormFamiliar />} />
+        <Route path="/form-coletivo" element={<FormColetivo />} />
 
         <Route path="/login" element={<Login />} />
         <Route path="/admin" element={<AdminAsaas />} />
@@ -80,6 +82,7 @@ export default function App() {
         <Route path="/faq" element={<FAQ />} />
         <Route path="/termos" element={<Termos />} />
         <Route path="/privacidade" element={<Privacidade />} />
+
         <Route path="*" element={<Home />} />
       </Routes>
     </>
