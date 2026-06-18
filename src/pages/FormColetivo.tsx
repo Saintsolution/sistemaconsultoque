@@ -2,31 +2,87 @@ import { useState } from 'react';
 
 const WEBHOOK_URL = 'https://n8n.saintsolution.com.br/webhook/coletivo-empresarial';
 
+type Titular = {
+  tipo: 'individual' | 'familiar';
+  tit_nome: string;
+  tit_cpf: string;
+  tit_nasc: string;
+  tit_email: string;
+  tit_tel: string;
+};
+
 export function FormColetivo() {
-  const [mesmoTitular, setMesmoTitular] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+
+  const [qtdInd, setQtdInd] = useState(0);
+  const [qtdFam, setQtdFam] = useState(0);
 
   const [formData, setFormData] = useState({
     assoc_nome: '',
     assoc_cpf: '',
+    assoc_nasc: '',
     assoc_email: '',
     assoc_tel: '',
     empresa_nome: '',
     empresa_cnpj: '',
-    tit_nome: '',
-    tit_cpf: '',
-    tit_email: '',
-    tit_tel: '',
   });
+
+  const [titulares, setTitulares] = useState<Titular[]>([]);
+
+  const totalTitulares = qtdInd + qtdFam;
+  const precoInd = totalTitulares >= 10 ? 30 : 33;
+  const precoFam = totalTitulares >= 10 ? 60 : 66;
+  const vlTotal = qtdInd * precoInd + qtdFam * precoFam;
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
+    setFormData((prev) => ({ ...prev, [name]: value }));
+  }
 
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+  function atualizarQuantidades(novoInd: number, novoFam: number) {
+    setQtdInd(novoInd);
+    setQtdFam(novoFam);
+
+    const novosTitulares: Titular[] = [];
+
+    for (let i = 0; i < novoInd; i++) {
+      novosTitulares.push({
+        tipo: 'individual',
+        tit_nome: titulares[i]?.tit_nome || '',
+        tit_cpf: titulares[i]?.tit_cpf || '',
+        tit_nasc: titulares[i]?.tit_nasc || '',
+        tit_email: titulares[i]?.tit_email || '',
+        tit_tel: titulares[i]?.tit_tel || '',
+      });
+    }
+
+    for (let i = 0; i < novoFam; i++) {
+      const indexAntigo = novoInd + i;
+
+      novosTitulares.push({
+        tipo: 'familiar',
+        tit_nome: titulares[indexAntigo]?.tit_nome || '',
+        tit_cpf: titulares[indexAntigo]?.tit_cpf || '',
+        tit_nasc: titulares[indexAntigo]?.tit_nasc || '',
+        tit_email: titulares[indexAntigo]?.tit_email || '',
+        tit_tel: titulares[indexAntigo]?.tit_tel || '',
+      });
+    }
+
+    setTitulares(novosTitulares);
+  }
+
+  function handleTitularChange(
+    index: number,
+    campo: keyof Titular,
+    valor: string
+  ) {
+    setTitulares((prev) =>
+      prev.map((titular, i) =>
+        i === index ? { ...titular, [campo]: valor } : titular
+      )
+    );
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -34,53 +90,54 @@ export function FormColetivo() {
     setLoading(true);
     setErro('');
 
+    if (totalTitulares === 0) {
+      setErro('Informe pelo menos 1 titular.');
+      setLoading(false);
+      return;
+    }
+
     const codColab = localStorage.getItem('referenciador_id') || '0001';
 
-    const titular = mesmoTitular
-      ? {
-          tit_nome: formData.assoc_nome,
-          tit_cpf: formData.assoc_cpf,
-          tit_email: formData.assoc_email,
-          tit_tel: formData.assoc_tel,
-          cod_plano: '1138',
-          status_titular: 'inativo',
-        }
-      : {
-          tit_nome: formData.tit_nome,
-          tit_cpf: formData.tit_cpf,
-          tit_email: formData.tit_email,
-          tit_tel: formData.tit_tel,
-          cod_plano: '1138',
-          status_titular: 'inativo',
-        };
+    const titularesPayload = titulares.map((titular) => ({
+      tit_nome: titular.tit_nome,
+      tit_cpf: titular.tit_cpf,
+      tit_nasc: titular.tit_nasc,
+      tit_email: titular.tit_email,
+      tit_tel: titular.tit_tel,
+      cod_plano: titular.tipo === 'individual' ? 'c1138' : 'c1140',
+      tipo_plano: titular.tipo === 'individual' ? '1138' : '1140',
+      tipo_titular: titular.tipo,
+      status_titular: 'inativo',
+    }));
 
     const payload = {
       origem: 'site_consultoque',
-      origem_form: 'individual',
+      origem_form: 'coletivo',
 
       cod_colab: codColab,
 
-      tipo_plano: 'ind_esp_pes',
-      cod_plano: '1138',
+      cod_plano: 'c_misto',
+      tipo_plano: 'coletivo',
 
       assoc_nome: formData.assoc_nome,
       assoc_cpf: formData.assoc_cpf,
+      assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
 
       empresa_nome: formData.empresa_nome,
       empresa_cnpj: formData.empresa_cnpj,
 
-      tit_ind: 1,
-      tit_fam: 0,
+      tit_ind: qtdInd,
+      tit_fam: qtdFam,
 
-      vl_ind: 33,
-      vl_fam: 0,
-      vl_total: 33,
+      vl_ind: precoInd,
+      vl_fam: precoFam,
+      vl_total: vlTotal,
 
       status_venda: 'pendente',
 
-      titulares: [titular],
+      titulares: titularesPayload,
     };
 
     try {
@@ -115,7 +172,7 @@ export function FormColetivo() {
 
   return (
     <main className="min-h-screen bg-slate-50 py-12 px-4">
-      <div className="max-w-xl mx-auto mb-4">
+      <div className="max-w-3xl mx-auto mb-4">
         <button
           type="button"
           onClick={() => window.location.href = '/'}
@@ -125,135 +182,105 @@ export function FormColetivo() {
         </button>
       </div>
 
-      <section className="max-w-xl mx-auto bg-white rounded-3xl shadow-lg p-6 md:p-8">
+      <section className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-6 md:p-8">
         <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">
-          Plano Individual
+          Plano Coletivo
         </h1>
 
         <p className="text-center text-gray-500 mt-2 mb-8">
-          1 titular • Teleconsulta 24h por R$ 33,00 mensais.
+          A partir de 10 titulares, valores reduzidos: R$ 30 individual e R$ 60 familiar.
         </p>
 
-        <form onSubmit={handleSubmit} className="space-y-5">
+        <form onSubmit={handleSubmit} className="space-y-6">
           <h2 className="text-lg font-black text-gray-900">
             Associado responsável pelo pagamento
           </h2>
 
-          <input
-            type="text"
-            name="assoc_nome"
-            value={formData.assoc_nome}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Nome completo do responsável"
-          />
+          <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
+          <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
+          <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+          <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
+          <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
 
-          <input
-            type="text"
-            name="assoc_cpf"
-            value={formData.assoc_cpf}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="CPF do responsável"
-          />
+          <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
+          <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
-          <input
-            type="email"
-            name="assoc_email"
-            value={formData.assoc_email}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="E-mail do responsável"
-          />
+          <div className="grid md:grid-cols-2 gap-4 border-t pt-6">
+            <div>
+              <label className="block text-sm font-bold mb-1">
+                Quantos titulares individuais?
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={qtdInd}
+                onChange={(e) =>
+                  atualizarQuantidades(Number(e.target.value), qtdFam)
+                }
+                className="w-full border border-gray-300 rounded-xl px-4 py-3"
+              />
+            </div>
 
-          <input
-            type="tel"
-            name="assoc_tel"
-            value={formData.assoc_tel}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Telefone / WhatsApp do responsável"
-          />
+            <div>
+              <label className="block text-sm font-bold mb-1">
+                Quantos titulares familiares?
+              </label>
+              <input
+                type="number"
+                min="0"
+                value={qtdFam}
+                onChange={(e) =>
+                  atualizarQuantidades(qtdInd, Number(e.target.value))
+                }
+                className="w-full border border-gray-300 rounded-xl px-4 py-3"
+              />
+            </div>
+          </div>
 
-          <input
-            type="text"
-            name="empresa_nome"
-            value={formData.empresa_nome}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Empresa (opcional)"
-          />
+          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
+            <p className="font-bold text-blue-900">
+              Total de titulares: {totalTitulares}
+            </p>
+            <p className="text-sm text-blue-800">
+              Individual: {qtdInd} × R$ {precoInd},00
+            </p>
+            <p className="text-sm text-blue-800">
+              Familiar: {qtdFam} × R$ {precoFam},00
+            </p>
+            <p className="text-xl font-black text-blue-900 mt-2">
+              Total mensal: R$ {vlTotal.toFixed(2).replace('.', ',')}
+            </p>
 
-          <input
-            type="text"
-            name="empresa_cnpj"
-            value={formData.empresa_cnpj}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="CNPJ (opcional)"
-          />
+            {totalTitulares > 0 && totalTitulares < 10 && (
+              <p className="text-sm font-bold text-red-600 mt-2">
+                Para obter valor coletivo, cadastre pelo menos 10 titulares.
+              </p>
+            )}
+          </div>
 
-          <label className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={mesmoTitular}
-              onChange={(e) => setMesmoTitular(e.target.checked)}
-              className="mt-1"
-            />
-            <span className="text-sm font-semibold text-blue-900">
-              O titular do plano é o próprio associado responsável pelo pagamento.
-            </span>
-          </label>
-
-          {!mesmoTitular && (
-            <div className="space-y-5 border-t pt-5">
+          {titulares.length > 0 && (
+            <div className="space-y-6 border-t pt-6">
               <h2 className="text-lg font-black text-gray-900">
-                Dados do titular do plano
+                Dados dos titulares
               </h2>
 
-              <input
-                type="text"
-                name="tit_nome"
-                value={formData.tit_nome}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="Nome completo do titular"
-              />
+              {titulares.map((titular, index) => (
+                <div
+                  key={index}
+                  className="border border-slate-200 rounded-2xl p-4 space-y-3 bg-slate-50"
+                >
+                  <h3 className="font-black text-gray-800">
+                    Titular {index + 1} —{' '}
+                    {titular.tipo === 'individual' ? 'Individual' : 'Familiar'}
+                  </h3>
 
-              <input
-                type="text"
-                name="tit_cpf"
-                value={formData.tit_cpf}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="CPF do titular"
-              />
-
-              <input
-                type="email"
-                name="tit_email"
-                value={formData.tit_email}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="E-mail do titular"
-              />
-
-              <input
-                type="tel"
-                name="tit_tel"
-                value={formData.tit_tel}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="Telefone / WhatsApp do titular"
-              />
+                  <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
+                  <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
+                  <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+                  <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
+                  <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
+                </div>
+              ))}
             </div>
           )}
 

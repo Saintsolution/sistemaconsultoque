@@ -10,23 +10,21 @@ export function FormIndividual() {
   const [formData, setFormData] = useState({
     assoc_nome: '',
     assoc_cpf: '',
+    assoc_nasc: '',
     assoc_email: '',
     assoc_tel: '',
     empresa_nome: '',
     empresa_cnpj: '',
     tit_nome: '',
     tit_cpf: '',
+    tit_nasc: '',
     tit_email: '',
     tit_tel: '',
   });
 
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
-
-    setFormData((prev) => ({
-      ...prev,
-      [name]: value,
-    }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   }
 
   async function handleSubmit(e: React.FormEvent) {
@@ -40,6 +38,7 @@ export function FormIndividual() {
       ? {
           tit_nome: formData.assoc_nome,
           tit_cpf: formData.assoc_cpf,
+          tit_nasc: formData.assoc_nasc,
           tit_email: formData.assoc_email,
           tit_tel: formData.assoc_tel,
           cod_plano: 'p1138',
@@ -49,6 +48,7 @@ export function FormIndividual() {
       : {
           tit_nome: formData.tit_nome,
           tit_cpf: formData.tit_cpf,
+          tit_nasc: formData.tit_nasc,
           tit_email: formData.tit_email,
           tit_tel: formData.tit_tel,
           cod_plano: 'p1138',
@@ -59,36 +59,29 @@ export function FormIndividual() {
     const payload = {
       origem: 'site_consultoque',
       origem_form: 'individual',
-
       cod_colab: codColab,
-
       cod_plano: 'p1138',
       tipo_plano: '1138',
-
       assoc_nome: formData.assoc_nome,
       assoc_cpf: formData.assoc_cpf,
+      assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-
       empresa_nome: formData.empresa_nome,
       empresa_cnpj: formData.empresa_cnpj,
-
       tit_ind: 1,
       tit_fam: 0,
-
       vl_ind: 33,
       vl_fam: 0,
       vl_total: 33,
-
       status_venda: 'pendente',
-
       titulares: [titular],
     };
 
     try {
       const response = await fetch(WEBHOOK_URL, {
         method: 'POST',
-        headers: { 'Content-Type': 'text/plain' },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(payload),
       });
 
@@ -141,63 +134,14 @@ export function FormIndividual() {
             Associado responsável pelo pagamento
           </h2>
 
-          <input
-            type="text"
-            name="assoc_nome"
-            value={formData.assoc_nome}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Nome completo do responsável"
-          />
+          <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
+          <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
+          <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+          <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
+          <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
 
-          <input
-            type="text"
-            name="assoc_cpf"
-            value={formData.assoc_cpf}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="CPF do responsável"
-          />
-
-          <input
-            type="email"
-            name="assoc_email"
-            value={formData.assoc_email}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="E-mail do responsável"
-          />
-
-          <input
-            type="tel"
-            name="assoc_tel"
-            value={formData.assoc_tel}
-            onChange={handleChange}
-            required
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Telefone / WhatsApp do responsável"
-          />
-
-          <input
-            type="text"
-            name="empresa_nome"
-            value={formData.empresa_nome}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="Empresa (opcional)"
-          />
-
-          <input
-            type="text"
-            name="empresa_cnpj"
-            value={formData.empresa_cnpj}
-            onChange={handleChange}
-            className="w-full border border-gray-300 rounded-xl px-4 py-3"
-            placeholder="CNPJ (opcional)"
-          />
+          <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
+          <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
           <label className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4 cursor-pointer">
             <input
@@ -217,45 +161,11 @@ export function FormIndividual() {
                 Dados do titular do plano
               </h2>
 
-              <input
-                type="text"
-                name="tit_nome"
-                value={formData.tit_nome}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="Nome completo do titular"
-              />
-
-              <input
-                type="text"
-                name="tit_cpf"
-                value={formData.tit_cpf}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="CPF do titular"
-              />
-
-              <input
-                type="email"
-                name="tit_email"
-                value={formData.tit_email}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="E-mail do titular"
-              />
-
-              <input
-                type="tel"
-                name="tit_tel"
-                value={formData.tit_tel}
-                onChange={handleChange}
-                required={!mesmoTitular}
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-                placeholder="Telefone / WhatsApp do titular"
-              />
+              <input type="text" name="tit_nome" value={formData.tit_nome} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
+              <input type="text" name="tit_cpf" value={formData.tit_cpf} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
+              <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+              <input type="email" name="tit_email" value={formData.tit_email} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
+              <input type="tel" name="tit_tel" value={formData.tit_tel} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
             </div>
           )}
 
