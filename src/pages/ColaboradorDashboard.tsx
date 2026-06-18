@@ -2,7 +2,7 @@ import { useState, useEffect } from 'react';
 import axios from 'axios';
 
 const WEBHOOK_UPDATE_COLAB =
-  'https://n8n.saintsolution.com.br/webhook/update-dados-colaborador';
+  'https://n8n.saintsolution.com.br/webhook/edita-colab';
 
 function formatCod(value: any) {
   if (value === null || value === undefined || value === '') return '';
@@ -335,7 +335,8 @@ export function ColaboradorDashboard() {
           <button
             className="text-sm text-red-600 underline"
             onClick={() => {
-              localStorage.clear();
+              localStorage.removeItem('cod_colab');
+              localStorage.removeItem('nome_colab');
               window.location.href = '/';
             }}
           >
@@ -370,11 +371,12 @@ export function ColaboradorDashboard() {
 
       <Toggle id="titulares" titulo="Titulares vinculados">
         <Tabela
-          colunas={['Contrato', 'Titular', 'CPF', 'E-mail', 'Telefone', 'Código Plano', 'Status']}
+          colunas={['Contrato', 'Titular', 'CPF', 'Nascimento', 'E-mail', 'Telefone', 'Código Plano', 'Status']}
           linhas={titulares.map((t: any) => [
             t.num_contrato,
             t.tit_nome,
             t.tit_cpf,
+            t.tit_nasc,
             t.tit_email,
             t.tit_tel,
             t.cod_plano,
