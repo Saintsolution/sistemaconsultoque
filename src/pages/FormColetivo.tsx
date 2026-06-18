@@ -73,11 +73,7 @@ export function FormColetivo() {
     setTitulares(novosTitulares);
   }
 
-  function handleTitularChange(
-    index: number,
-    campo: keyof Titular,
-    valor: string
-  ) {
+  function handleTitularChange(index: number, campo: keyof Titular, valor: string) {
     setTitulares((prev) =>
       prev.map((titular, i) =>
         i === index ? { ...titular, [campo]: valor } : titular
@@ -116,7 +112,7 @@ export function FormColetivo() {
 
       cod_colab: codColab,
 
-      cod_plano: 'c_misto',
+      cod_plano: 'coletivo',
       tipo_plano: 'coletivo',
 
       assoc_nome: formData.assoc_nome,
@@ -130,6 +126,7 @@ export function FormColetivo() {
 
       tit_ind: qtdInd,
       tit_fam: qtdFam,
+      tit_total: totalTitulares,
 
       vl_ind: precoInd,
       vl_fam: precoFam,
@@ -206,83 +203,47 @@ export function FormColetivo() {
           <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
           <div className="grid md:grid-cols-2 gap-4 border-t pt-6">
-            <div>
-              <label className="block text-sm font-bold mb-1">
-                Quantos titulares individuais?
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={qtdInd}
-                onChange={(e) =>
-                  atualizarQuantidades(Number(e.target.value), qtdFam)
-                }
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-              />
-            </div>
+            <input
+              type="number"
+              min="0"
+              value={qtdInd}
+              onChange={(e) => atualizarQuantidades(Number(e.target.value), qtdFam)}
+              className="w-full border border-gray-300 rounded-xl px-4 py-3"
+              placeholder="Titulares individuais"
+            />
 
-            <div>
-              <label className="block text-sm font-bold mb-1">
-                Quantos titulares familiares?
-              </label>
-              <input
-                type="number"
-                min="0"
-                value={qtdFam}
-                onChange={(e) =>
-                  atualizarQuantidades(qtdInd, Number(e.target.value))
-                }
-                className="w-full border border-gray-300 rounded-xl px-4 py-3"
-              />
-            </div>
+            <input
+              type="number"
+              min="0"
+              value={qtdFam}
+              onChange={(e) => atualizarQuantidades(qtdInd, Number(e.target.value))}
+              className="w-full border border-gray-300 rounded-xl px-4 py-3"
+              placeholder="Titulares familiares"
+            />
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-            <p className="font-bold text-blue-900">
-              Total de titulares: {totalTitulares}
-            </p>
-            <p className="text-sm text-blue-800">
-              Individual: {qtdInd} × R$ {precoInd},00
-            </p>
-            <p className="text-sm text-blue-800">
-              Familiar: {qtdFam} × R$ {precoFam},00
-            </p>
+            <p className="font-bold text-blue-900">Total de titulares: {totalTitulares}</p>
+            <p className="text-sm text-blue-800">Individual: {qtdInd} × R$ {precoInd},00</p>
+            <p className="text-sm text-blue-800">Familiar: {qtdFam} × R$ {precoFam},00</p>
             <p className="text-xl font-black text-blue-900 mt-2">
               Total mensal: R$ {vlTotal.toFixed(2).replace('.', ',')}
             </p>
-
-            {totalTitulares > 0 && totalTitulares < 10 && (
-              <p className="text-sm font-bold text-red-600 mt-2">
-                Para obter valor coletivo, cadastre pelo menos 10 titulares.
-              </p>
-            )}
           </div>
 
-          {titulares.length > 0 && (
-            <div className="space-y-6 border-t pt-6">
-              <h2 className="text-lg font-black text-gray-900">
-                Dados dos titulares
-              </h2>
+          {titulares.map((titular, index) => (
+            <div key={index} className="border rounded-2xl p-4 space-y-3 bg-slate-50">
+              <h3 className="font-black">
+                Titular {index + 1} — {titular.tipo === 'individual' ? 'Individual' : 'Familiar'}
+              </h3>
 
-              {titulares.map((titular, index) => (
-                <div
-                  key={index}
-                  className="border border-slate-200 rounded-2xl p-4 space-y-3 bg-slate-50"
-                >
-                  <h3 className="font-black text-gray-800">
-                    Titular {index + 1} —{' '}
-                    {titular.tipo === 'individual' ? 'Individual' : 'Familiar'}
-                  </h3>
-
-                  <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
-                  <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
-                  <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
-                  <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
-                  <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
-                </div>
-              ))}
+              <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Nome completo" />
+              <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="CPF" />
+              <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border rounded-xl px-4 py-3" />
+              <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="E-mail" />
+              <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp" />
             </div>
-          )}
+          ))}
 
           {erro && (
             <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">
