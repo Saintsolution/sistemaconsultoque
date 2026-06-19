@@ -109,31 +109,23 @@ export function FormColetivo() {
     const payload = {
       origem: 'site_consultoque',
       origem_form: 'coletivo',
-
       cod_colab: codColab,
-
       cod_plano: 'coletivo',
       tipo_plano: 'coletivo',
-
       assoc_nome: formData.assoc_nome,
       assoc_cpf: formData.assoc_cpf,
       assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-
       empresa_nome: formData.empresa_nome,
       empresa_cnpj: formData.empresa_cnpj,
-
       tit_ind: qtdInd,
       tit_fam: qtdFam,
       tit_total: totalTitulares,
-
       vl_ind: precoInd,
       vl_fam: precoFam,
       vl_total: vlTotal,
-
       status_venda: 'pendente',
-
       titulares: titularesPayload,
     };
 
@@ -195,7 +187,12 @@ export function FormColetivo() {
 
           <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
           <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
-          <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+          
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
+            <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+          </div>
+
           <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
           <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
 
@@ -203,23 +200,14 @@ export function FormColetivo() {
           <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
           <div className="grid md:grid-cols-2 gap-4 border-t pt-6">
-            <input
-              type="number"
-              min="0"
-              value={qtdInd}
-              onChange={(e) => atualizarQuantidades(Number(e.target.value), qtdFam)}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3"
-              placeholder="Titulares individuais"
-            />
-
-            <input
-              type="number"
-              min="0"
-              value={qtdFam}
-              onChange={(e) => atualizarQuantidades(qtdInd, Number(e.target.value))}
-              className="w-full border border-gray-300 rounded-xl px-4 py-3"
-              placeholder="Titulares familiares"
-            />
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Titulares Individuais</label>
+              <input type="number" min="0" value={qtdInd} onChange={(e) => atualizarQuantidades(Number(e.target.value), qtdFam)} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Ex: 1" />
+            </div>
+            <div>
+              <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Titulares Familiares</label>
+              <input type="number" min="0" value={qtdFam} onChange={(e) => atualizarQuantidades(qtdInd, Number(e.target.value))} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Ex: 1" />
+            </div>
           </div>
 
           <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
@@ -239,7 +227,12 @@ export function FormColetivo() {
 
               <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Nome completo" />
               <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="CPF" />
-              <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border rounded-xl px-4 py-3" />
+              
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
+                <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border rounded-xl px-4 py-3 bg-white text-gray-900" />
+              </div>
+              
               <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="E-mail" />
               <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp" />
             </div>
