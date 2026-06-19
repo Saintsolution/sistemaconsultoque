@@ -136,7 +136,12 @@ export function FormIndividual() {
 
           <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
           <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
-          <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+          
+          <div>
+            <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
+            <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+          </div>
+
           <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
           <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
 
@@ -163,7 +168,12 @@ export function FormIndividual() {
 
               <input type="text" name="tit_nome" value={formData.tit_nome} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
               <input type="text" name="tit_cpf" value={formData.tit_cpf} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
-              <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+              
+              <div>
+                <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
+                <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+              </div>
+              
               <input type="email" name="tit_email" value={formData.tit_email} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
               <input type="tel" name="tit_tel" value={formData.tit_tel} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
             </div>
