@@ -6,7 +6,7 @@ export function FormIndividual() {
   const [mesmoTitular, setMesmoTitular] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
-  const [sucesso, setSucesso] = useState(false); // Mudado para boolean para controlar a tela
+  const [sucesso, setSucesso] = useState(false);
 
   const [formData, setFormData] = useState({
     assoc_nome: '',
@@ -14,8 +14,6 @@ export function FormIndividual() {
     assoc_nasc: '',
     assoc_email: '',
     assoc_tel: '',
-    empresa_nome: '',
-    empresa_cnpj: '',
     tit_nome: '',
     tit_cpf: '',
     tit_nasc: '',
@@ -69,8 +67,6 @@ export function FormIndividual() {
       assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-      empresa_nome: formData.empresa_nome,
-      empresa_cnpj: formData.empresa_cnpj,
       tit_ind: totalTitulares,
       tit_fam: 0,
       tit_total: totalTitulares,
@@ -89,10 +85,7 @@ export function FormIndividual() {
       });
 
       if (!response.ok) throw new Error('Erro ao enviar cadastro.');
-
-      // Cadastro concluído, apenas exibimos a mensagem de sucesso
       setSucesso(true);
-
     } catch (error) {
       console.error(error);
       setErro('Não foi possível iniciar o pagamento. Tente novamente.');
@@ -103,11 +96,7 @@ export function FormIndividual() {
   return (
     <main className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-xl mx-auto mb-4">
-        <button
-          type="button"
-          onClick={() => window.location.href = '/'}
-          className="text-sm font-bold text-blue-600 hover:text-blue-800"
-        >
+        <button type="button" onClick={() => window.location.href = '/'} className="text-sm font-bold text-blue-600 hover:text-blue-800">
           ← Voltar e revisar os planos
         </button>
       </div>
@@ -121,17 +110,11 @@ export function FormIndividual() {
           </div>
         ) : (
           <>
-            <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">
-              Plano Individual
-            </h1>
-            <p className="text-center text-gray-500 mt-2 mb-8">
-              1 titular • Teleconsulta 24h por R$ 33,00 mensais.
-            </p>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">Plano Individual</h1>
+            <p className="text-center text-gray-500 mt-2 mb-8">1 titular • Teleconsulta 24h por R$ 33,00 mensais.</p>
 
             <form onSubmit={handleSubmit} className="space-y-5">
-              <h2 className="text-lg font-black text-gray-900">
-                Associado responsável pelo pagamento
-              </h2>
+              <h2 className="text-lg font-black text-gray-900">Associado responsável pelo pagamento</h2>
               <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
               <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
               <div>
@@ -140,8 +123,6 @@ export function FormIndividual() {
               </div>
               <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
               <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
-              <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
-              <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
               <label className="flex items-start gap-3 bg-blue-50 border border-blue-200 rounded-xl p-4 cursor-pointer">
                 <input type="checkbox" checked={mesmoTitular} onChange={(e) => setMesmoTitular(e.target.checked)} className="mt-1" />
@@ -165,7 +146,7 @@ export function FormIndividual() {
               {erro && <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">{erro}</div>}
 
               <button type="submit" disabled={loading} className="w-full bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-60 text-white font-black py-4 rounded-2xl uppercase tracking-wide transition-all">
-                {loading ? 'Processando... Emitindo seu código...' : 'Ir para pagamento'}
+                {loading ? 'Processando...' : 'Ir para pagamento'}
               </button>
             </form>
           </>

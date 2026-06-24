@@ -14,8 +14,6 @@ export function FormFamiliar() {
     assoc_nasc: '',
     assoc_email: '',
     assoc_tel: '',
-    empresa_nome: '',
-    empresa_cnpj: '',
     tit_nome: '',
     tit_cpf: '',
     tit_nasc: '',
@@ -69,8 +67,6 @@ export function FormFamiliar() {
       assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-      empresa_nome: formData.empresa_nome,
-      empresa_cnpj: formData.empresa_cnpj,
       tit_ind: 0,
       tit_fam: totalTitulares,
       tit_total: totalTitulares,
@@ -140,8 +136,6 @@ export function FormFamiliar() {
               </div>
               <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
               <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
-              <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
-              <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
               <label className="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl p-4 cursor-pointer">
                 <input type="checkbox" checked={mesmoTitular} onChange={(e) => setMesmoTitular(e.target.checked)} className="mt-1" />
