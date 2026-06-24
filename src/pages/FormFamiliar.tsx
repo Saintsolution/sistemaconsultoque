@@ -6,6 +6,7 @@ export function FormFamiliar() {
   const [mesmoTitular, setMesmoTitular] = useState(true);
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState(false); // Estado para mensagem direta
 
   const [formData, setFormData] = useState({
     assoc_nome: '',
@@ -56,28 +57,26 @@ export function FormFamiliar() {
           status_titular: 'inativo',
         };
 
+    const totalTitulares = 1;
     const payload = {
       origem: 'site_consultoque',
       origem_form: 'familiar',
       cod_colab: codColab,
       cod_plano: 'p1140',
       tipo_plano: '1140',
-
       assoc_nome: formData.assoc_nome,
       assoc_cpf: formData.assoc_cpf,
       assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-
       empresa_nome: formData.empresa_nome,
       empresa_cnpj: formData.empresa_cnpj,
-
       tit_ind: 0,
-      tit_fam: 1,
+      tit_fam: totalTitulares,
+      tit_total: totalTitulares,
       vl_ind: 0,
-      vl_fam: 66,
-      vl_total: 66,
-
+      vl_fam: 66 * totalTitulares,
+      vl_total: 66 * totalTitulares,
       status_venda: 'pendente',
       titulares: [titular],
     };
@@ -91,23 +90,12 @@ export function FormFamiliar() {
 
       if (!response.ok) throw new Error('Erro ao enviar cadastro.');
 
-      const data = await response.json();
+      // Cadastro concluído, apenas ativamos a mensagem de sucesso
+      setSucesso(true);
 
-      const paymentUrl =
-        data.paymentUrl ||
-        data.invoiceUrl ||
-        data.bankSlipUrl ||
-        data.url;
-
-      if (!paymentUrl) {
-        throw new Error('O link de pagamento não foi retornado.');
-      }
-
-      window.location.href = paymentUrl;
     } catch (error) {
       console.error(error);
-      setErro('Não foi possível iniciar o pagamento. Tente novamente.');
-    } finally {
+      setErro('Não foi possível concluir o processo. Tente novamente.');
       setLoading(false);
     }
   }
@@ -125,78 +113,63 @@ export function FormFamiliar() {
       </div>
 
       <section className="max-w-xl mx-auto bg-white rounded-3xl shadow-lg p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">
-          Plano Familiar
-        </h1>
-
-        <p className="text-center text-gray-500 mt-2 mb-8">
-          1 titular + 3 dependentes • Teleconsulta 24h por R$ 66,00 mensais.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-5">
-          <h2 className="text-lg font-black text-gray-900">
-            Associado responsável pelo pagamento
-          </h2>
-
-          <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
-          <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
-          
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
-            <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+        {sucesso ? (
+          <div className="text-center py-10">
+            <h2 className="text-2xl font-black text-green-600">LINK DE PAGAMENTO GERADO!</h2>
+            <p className="mt-4 text-lg font-bold text-gray-800">ABRA SEU E-MAIL!</p>
+            <p className="mt-2 text-sm text-gray-500">Enviamos o link de pagamento para o endereço cadastrado.</p>
           </div>
+        ) : (
+          <>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">
+              Plano Familiar
+            </h1>
+            <p className="text-center text-gray-500 mt-2 mb-8">
+              1 titular + 3 dependentes • Teleconsulta 24h por R$ 66,00 mensais.
+            </p>
 
-          <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
-          <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
-
-          <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
-          <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
-
-          <label className="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl p-4 cursor-pointer">
-            <input
-              type="checkbox"
-              checked={mesmoTitular}
-              onChange={(e) => setMesmoTitular(e.target.checked)}
-              className="mt-1"
-            />
-            <span className="text-sm font-semibold text-green-900">
-              O titular do plano familiar é o próprio associado responsável pelo pagamento.
-            </span>
-          </label>
-
-          {!mesmoTitular && (
-            <div className="space-y-5 border-t pt-5">
+            <form onSubmit={handleSubmit} className="space-y-5">
               <h2 className="text-lg font-black text-gray-900">
-                Dados do titular do plano familiar
+                Associado responsável pelo pagamento
               </h2>
-
-              <input type="text" name="tit_nome" value={formData.tit_nome} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
-              <input type="text" name="tit_cpf" value={formData.tit_cpf} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
-              
+              <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
+              <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
               <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
-                <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+                <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
+                <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
               </div>
-              
-              <input type="email" name="tit_email" value={formData.tit_email} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
-              <input type="tel" name="tit_tel" value={formData.tit_tel} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
-            </div>
-          )}
+              <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
+              <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
+              <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
+              <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
 
-          {erro && (
-            <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">
-              {erro}
-            </div>
-          )}
+              <label className="flex items-start gap-3 bg-green-50 border border-green-200 rounded-xl p-4 cursor-pointer">
+                <input type="checkbox" checked={mesmoTitular} onChange={(e) => setMesmoTitular(e.target.checked)} className="mt-1" />
+                <span className="text-sm font-semibold text-green-900">O titular do plano familiar é o próprio associado.</span>
+              </label>
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-60 text-white font-black py-4 rounded-2xl uppercase tracking-wide transition-all"
-          >
-            {loading ? 'Gerando pagamento...' : 'Ir para pagamento'}
-          </button>
-        </form>
+              {!mesmoTitular && (
+                <div className="space-y-5 border-t pt-5">
+                  <h2 className="text-lg font-black text-gray-900">Dados do titular</h2>
+                  <input type="text" name="tit_nome" value={formData.tit_nome} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
+                  <input type="text" name="tit_cpf" value={formData.tit_cpf} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
+                  <div>
+                    <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
+                    <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+                  </div>
+                  <input type="email" name="tit_email" value={formData.tit_email} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
+                  <input type="tel" name="tit_tel" value={formData.tit_tel} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
+                </div>
+              )}
+
+              {erro && <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">{erro}</div>}
+
+              <button type="submit" disabled={loading} className="w-full bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-60 text-white font-black py-4 rounded-2xl uppercase tracking-wide transition-all">
+                {loading ? 'Processando... Emitindo seu código...' : 'Ir para pagamento'}
+              </button>
+            </form>
+          </>
+        )}
       </section>
     </main>
   );
