@@ -19,9 +19,8 @@ export function Home() {
       <Telemedicine />
 
       <main className="max-w-5xl mx-auto px-4 py-12 space-y-12">
-        <section id="precos" className="space-y-8">
-          <PlanGrid title="PLANOS PESSOAIS" type="personal" />
-          <PlanGrid title="PLANOS COLETIVOS - ACIMA DE 10 TITULARES" type="business" />
+        <section id="precos">
+          <PlanGrid />
         </section>
 
         <Benefits />

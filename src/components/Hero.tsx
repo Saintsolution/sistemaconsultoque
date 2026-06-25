@@ -52,7 +52,7 @@ export function Hero() {
             </span>
 
             <span className="text-sm font-black uppercase mt-1">
-              1 Titular + Dependentes
+              1 Titular + 3 Dependentes
             </span>
 
             <span className="text-3xl font-black my-1">
