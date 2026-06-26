@@ -88,7 +88,7 @@ export function FormIndividual() {
       setSucesso(true);
     } catch (error) {
       console.error(error);
-      setErro('Não foi possível iniciar o pagamento. Tente novamente.');
+      setErro('Não foi possível realizar o cadastro. Tente novamente.');
       setLoading(false);
     }
   }
@@ -103,10 +103,9 @@ export function FormIndividual() {
 
       <section className="max-w-xl mx-auto bg-white rounded-3xl shadow-lg p-6 md:p-8">
         {sucesso ? (
-          <div className="text-center py-10">
-            <h2 className="text-2xl font-black text-green-600">LINK DE PAGAMENTO GERADO!</h2>
-            <p className="mt-4 text-lg font-bold text-gray-800">ABRA SEU E-MAIL!</p>
-            <p className="mt-2 text-sm text-gray-500">Enviamos o link de pagamento para o endereço cadastrado.</p>
+          <div className="text-center py-12">
+            <h2 className="text-3xl font-black text-green-600 mb-4">Cadastro realizado!</h2>
+            <p className="text-lg text-gray-700">Verifique seu e-mail, enviamos o link para acessar o pagamento da sua mensalidade.</p>
           </div>
         ) : (
           <>
@@ -146,7 +145,7 @@ export function FormIndividual() {
               {erro && <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">{erro}</div>}
 
               <button type="submit" disabled={loading} className="w-full bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-60 text-white font-black py-4 rounded-2xl uppercase tracking-wide transition-all">
-                {loading ? 'Processando...' : 'Ir para pagamento'}
+                {loading ? 'Processando...' : 'Enviar cadastro'}
               </button>
             </form>
           </>

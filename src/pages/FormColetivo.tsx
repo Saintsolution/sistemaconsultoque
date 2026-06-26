@@ -14,6 +14,7 @@ type Titular = {
 export function FormColetivo() {
   const [loading, setLoading] = useState(false);
   const [erro, setErro] = useState('');
+  const [sucesso, setSucesso] = useState(false);
 
   const [qtdInd, setQtdInd] = useState(0);
   const [qtdFam, setQtdFam] = useState(0);
@@ -24,8 +25,6 @@ export function FormColetivo() {
     assoc_nasc: '',
     assoc_email: '',
     assoc_tel: '',
-    empresa_nome: '',
-    empresa_cnpj: '',
   });
 
   const [titulares, setTitulares] = useState<Titular[]>([]);
@@ -45,7 +44,6 @@ export function FormColetivo() {
     setQtdFam(novoFam);
 
     const novosTitulares: Titular[] = [];
-
     for (let i = 0; i < novoInd; i++) {
       novosTitulares.push({
         tipo: 'individual',
@@ -56,10 +54,8 @@ export function FormColetivo() {
         tit_tel: titulares[i]?.tit_tel || '',
       });
     }
-
     for (let i = 0; i < novoFam; i++) {
       const indexAntigo = novoInd + i;
-
       novosTitulares.push({
         tipo: 'familiar',
         tit_nome: titulares[indexAntigo]?.tit_nome || '',
@@ -69,7 +65,6 @@ export function FormColetivo() {
         tit_tel: titulares[indexAntigo]?.tit_tel || '',
       });
     }
-
     setTitulares(novosTitulares);
   }
 
@@ -117,8 +112,6 @@ export function FormColetivo() {
       assoc_nasc: formData.assoc_nasc,
       assoc_email: formData.assoc_email,
       assoc_tel: formData.assoc_tel,
-      empresa_nome: formData.empresa_nome,
-      empresa_cnpj: formData.empresa_cnpj,
       tit_ind: qtdInd,
       tit_fam: qtdFam,
       tit_total: totalTitulares,
@@ -138,23 +131,10 @@ export function FormColetivo() {
 
       if (!response.ok) throw new Error('Erro ao enviar cadastro.');
 
-      const data = await response.json();
-
-      const paymentUrl =
-        data.paymentUrl ||
-        data.invoiceUrl ||
-        data.bankSlipUrl ||
-        data.url;
-
-      if (!paymentUrl) {
-        throw new Error('O link de pagamento não foi retornado.');
-      }
-
-      window.location.href = paymentUrl;
+      setSucesso(true);
     } catch (error) {
       console.error(error);
-      setErro('Não foi possível iniciar o pagamento. Tente novamente.');
-    } finally {
+      setErro('Não foi possível realizar o cadastro. Tente novamente.');
       setLoading(false);
     }
   }
@@ -172,86 +152,54 @@ export function FormColetivo() {
       </div>
 
       <section className="max-w-3xl mx-auto bg-white rounded-3xl shadow-lg p-6 md:p-8">
-        <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">
-          Plano Coletivo
-        </h1>
-
-        <p className="text-center text-gray-500 mt-2 mb-8">
-          A partir de 10 titulares, valores reduzidos: R$ 30 individual e R$ 60 familiar.
-        </p>
-
-        <form onSubmit={handleSubmit} className="space-y-6">
-          <h2 className="text-lg font-black text-gray-900">
-            Associado responsável pelo pagamento
-          </h2>
-
-          <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
-          <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
-          
-          <div>
-            <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
-            <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
+        {sucesso ? (
+          <div className="text-center py-12">
+            <h2 className="text-3xl font-black text-green-600 mb-4">Cadastro realizado!</h2>
+            <p className="text-lg text-gray-700">Verifique seu e-mail, enviamos o link para acessar o pagamento da sua mensalidade.</p>
           </div>
+        ) : (
+          <>
+            <h1 className="text-2xl md:text-3xl font-black text-gray-900 text-center">Plano Coletivo</h1>
+            <p className="text-center text-gray-500 mt-2 mb-8">A partir de 10 titulares, valores reduzidos: R$ 30 individual e R$ 60 familiar.</p>
 
-          <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
-          <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
+            <form onSubmit={handleSubmit} className="space-y-6">
+              <h2 className="text-lg font-black text-gray-900">Associado responsável</h2>
+              <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo" />
+              <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF" />
+              <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+              <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail" />
+              <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp" />
 
-          <input type="text" name="empresa_nome" value={formData.empresa_nome} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Empresa (opcional)" />
-          <input type="text" name="empresa_cnpj" value={formData.empresa_cnpj} onChange={handleChange} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CNPJ (opcional)" />
-
-          <div className="grid md:grid-cols-2 gap-4 border-t pt-6">
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Titulares Individuais</label>
-              <input type="number" min="0" value={qtdInd} onChange={(e) => atualizarQuantidades(Number(e.target.value), qtdFam)} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Ex: 1" />
-            </div>
-            <div>
-              <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Titulares Familiares</label>
-              <input type="number" min="0" value={qtdFam} onChange={(e) => atualizarQuantidades(qtdInd, Number(e.target.value))} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Ex: 1" />
-            </div>
-          </div>
-
-          <div className="bg-blue-50 border border-blue-200 rounded-2xl p-4">
-            <p className="font-bold text-blue-900">Total de titulares: {totalTitulares}</p>
-            <p className="text-sm text-blue-800">Individual: {qtdInd} × R$ {precoInd},00</p>
-            <p className="text-sm text-blue-800">Familiar: {qtdFam} × R$ {precoFam},00</p>
-            <p className="text-xl font-black text-blue-900 mt-2">
-              Total mensal: R$ {vlTotal.toFixed(2).replace('.', ',')}
-            </p>
-          </div>
-
-          {titulares.map((titular, index) => (
-            <div key={index} className="border rounded-2xl p-4 space-y-3 bg-slate-50">
-              <h3 className="font-black">
-                Titular {index + 1} — {titular.tipo === 'individual' ? 'Individual' : 'Familiar'}
-              </h3>
-
-              <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Nome completo" />
-              <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="CPF" />
-              
-              <div>
-                <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
-                <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border rounded-xl px-4 py-3 bg-white text-gray-900" />
+              <div className="grid md:grid-cols-2 gap-4 border-t pt-6">
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Individuais</label>
+                  <input type="number" min="0" value={qtdInd} onChange={(e) => atualizarQuantidades(Number(e.target.value), qtdFam)} className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+                </div>
+                <div>
+                  <label className="block text-sm font-bold text-gray-700 mb-1">Qtd. Familiares</label>
+                  <input type="number" min="0" value={qtdFam} onChange={(e) => atualizarQuantidades(qtdInd, Number(e.target.value))} className="w-full border border-gray-300 rounded-xl px-4 py-3" />
+                </div>
               </div>
-              
-              <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="E-mail" />
-              <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp" />
-            </div>
-          ))}
 
-          {erro && (
-            <div className="bg-red-50 text-red-700 text-sm font-semibold px-4 py-3 rounded-xl">
-              {erro}
-            </div>
-          )}
+              {titulares.map((titular, index) => (
+                <div key={index} className="border rounded-2xl p-4 space-y-3 bg-slate-50">
+                  <h3 className="font-black">Titular {index + 1} ({titular.tipo})</h3>
+                  <input type="text" value={titular.tit_nome} onChange={(e) => handleTitularChange(index, 'tit_nome', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="Nome completo" />
+                  <input type="text" value={titular.tit_cpf} onChange={(e) => handleTitularChange(index, 'tit_cpf', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="CPF" />
+                  <input type="date" value={titular.tit_nasc} onChange={(e) => handleTitularChange(index, 'tit_nasc', e.target.value)} required className="w-full border rounded-xl px-4 py-3" />
+                  <input type="email" value={titular.tit_email} onChange={(e) => handleTitularChange(index, 'tit_email', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="E-mail" />
+                  <input type="tel" value={titular.tit_tel} onChange={(e) => handleTitularChange(index, 'tit_tel', e.target.value)} required className="w-full border rounded-xl px-4 py-3" placeholder="WhatsApp" />
+                </div>
+              ))}
 
-          <button
-            type="submit"
-            disabled={loading}
-            className="w-full bg-[#22C55E] hover:bg-[#16a34a] disabled:opacity-60 text-white font-black py-4 rounded-2xl uppercase tracking-wide transition-all"
-          >
-            {loading ? 'Gerando pagamento...' : 'Ir para pagamento'}
-          </button>
-        </form>
+              {erro && <div className="text-red-600 font-semibold">{erro}</div>}
+
+              <button type="submit" disabled={loading} className="w-full bg-green-500 hover:bg-green-600 text-white font-black py-4 rounded-2xl uppercase transition-all">
+                {loading ? 'Processando...' : 'Enviar cadastro'}
+              </button>
+            </form>
+          </>
+        )}
       </section>
     </main>
   );
