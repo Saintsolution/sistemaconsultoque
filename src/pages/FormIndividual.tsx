@@ -21,6 +21,16 @@ export function FormIndividual() {
     tit_tel: '',
   });
 
+  function formatarData(data: string) {
+    if (!data) return '';
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}-${mes}-${ano}`;
+  }
+
+  function somenteTexto(value: string) {
+    return String(value || '').trim();
+  }
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,44 +45,49 @@ export function FormIndividual() {
 
     const titular = mesmoTitular
       ? {
-          tit_nome: formData.assoc_nome,
-          tit_cpf: formData.assoc_cpf,
-          tit_nasc: formData.assoc_nasc,
-          tit_email: formData.assoc_email,
-          tit_tel: formData.assoc_tel,
+          tit_nome: somenteTexto(formData.assoc_nome),
+          tit_cpf: somenteTexto(formData.assoc_cpf),
+          tit_nasc: formatarData(formData.assoc_nasc),
+          tit_email: somenteTexto(formData.assoc_email),
+          tit_tel: somenteTexto(formData.assoc_tel),
           cod_plano: 'p1138',
           tipo_plano: '1138',
           status_titular: 'inativo',
         }
       : {
-          tit_nome: formData.tit_nome,
-          tit_cpf: formData.tit_cpf,
-          tit_nasc: formData.tit_nasc,
-          tit_email: formData.tit_email,
-          tit_tel: formData.tit_tel,
+          tit_nome: somenteTexto(formData.tit_nome),
+          tit_cpf: somenteTexto(formData.tit_cpf),
+          tit_nasc: formatarData(formData.tit_nasc),
+          tit_email: somenteTexto(formData.tit_email),
+          tit_tel: somenteTexto(formData.tit_tel),
           cod_plano: 'p1138',
           tipo_plano: '1138',
           status_titular: 'inativo',
         };
 
     const totalTitulares = 1;
+
     const payload = {
       origem: 'site_consultoque',
       origem_form: 'individual',
       cod_colab: codColab,
       cod_plano: 'p1138',
       tipo_plano: '1138',
-      assoc_nome: formData.assoc_nome,
-      assoc_cpf: formData.assoc_cpf,
-      assoc_nasc: formData.assoc_nasc,
-      assoc_email: formData.assoc_email,
-      assoc_tel: formData.assoc_tel,
+
+      assoc_nome: somenteTexto(formData.assoc_nome),
+      assoc_cpf: somenteTexto(formData.assoc_cpf),
+      assoc_nasc: formatarData(formData.assoc_nasc),
+      assoc_email: somenteTexto(formData.assoc_email),
+      assoc_tel: somenteTexto(formData.assoc_tel),
+
       tit_ind: totalTitulares,
       tit_fam: 0,
       tit_total: totalTitulares,
+
       vl_ind: 33 * totalTitulares,
       vl_fam: 0,
       vl_total: 33 * totalTitulares,
+
       status_venda: 'pendente',
       titulares: [titular],
     };
@@ -85,6 +100,7 @@ export function FormIndividual() {
       });
 
       if (!response.ok) throw new Error('Erro ao enviar cadastro.');
+
       setSucesso(true);
     } catch (error) {
       console.error(error);
@@ -114,12 +130,15 @@ export function FormIndividual() {
 
             <form onSubmit={handleSubmit} className="space-y-5">
               <h2 className="text-lg font-black text-gray-900">Associado responsável pelo pagamento</h2>
+
               <input type="text" name="assoc_nome" value={formData.assoc_nome} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do responsável" />
               <input type="text" name="assoc_cpf" value={formData.assoc_cpf} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do responsável" />
+
               <div>
                 <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento</label>
                 <input type="date" name="assoc_nasc" value={formData.assoc_nasc} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
               </div>
+
               <input type="email" name="assoc_email" value={formData.assoc_email} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do responsável" />
               <input type="tel" name="assoc_tel" value={formData.assoc_tel} onChange={handleChange} required className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do responsável" />
 
@@ -131,12 +150,15 @@ export function FormIndividual() {
               {!mesmoTitular && (
                 <div className="space-y-5 border-t pt-5">
                   <h2 className="text-lg font-black text-gray-900">Dados do titular</h2>
+
                   <input type="text" name="tit_nome" value={formData.tit_nome} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Nome completo do titular" />
                   <input type="text" name="tit_cpf" value={formData.tit_cpf} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="CPF do titular" />
+
                   <div>
                     <label className="block text-sm font-bold text-gray-700 mb-1">Data de nascimento do titular</label>
                     <input type="date" name="tit_nasc" value={formData.tit_nasc} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3 bg-white text-gray-900" />
                   </div>
+
                   <input type="email" name="tit_email" value={formData.tit_email} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="E-mail do titular" />
                   <input type="tel" name="tit_tel" value={formData.tit_tel} onChange={handleChange} required={!mesmoTitular} className="w-full border border-gray-300 rounded-xl px-4 py-3" placeholder="Telefone / WhatsApp do titular" />
                 </div>

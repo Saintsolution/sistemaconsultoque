@@ -21,6 +21,18 @@ export function FormFamiliar() {
     tit_tel: '',
   });
 
+  // Função auxiliar para formatar a data para dd-mm-aaaa
+  function formatarData(data: string) {
+    if (!data) return '';
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}-${mes}-${ano}`;
+  }
+
+  // Função auxiliar para limpar textos
+  function somenteTexto(value: string) {
+    return String(value || '').trim();
+  }
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -35,21 +47,21 @@ export function FormFamiliar() {
 
     const titular = mesmoTitular
       ? {
-          tit_nome: formData.assoc_nome,
-          tit_cpf: formData.assoc_cpf,
-          tit_nasc: formData.assoc_nasc,
-          tit_email: formData.assoc_email,
-          tit_tel: formData.assoc_tel,
+          tit_nome: somenteTexto(formData.assoc_nome),
+          tit_cpf: somenteTexto(formData.assoc_cpf),
+          tit_nasc: formatarData(formData.assoc_nasc),
+          tit_email: somenteTexto(formData.assoc_email),
+          tit_tel: somenteTexto(formData.assoc_tel),
           cod_plano: 'p1140',
           tipo_plano: '1140',
           status_titular: 'inativo',
         }
       : {
-          tit_nome: formData.tit_nome,
-          tit_cpf: formData.tit_cpf,
-          tit_nasc: formData.tit_nasc,
-          tit_email: formData.tit_email,
-          tit_tel: formData.tit_tel,
+          tit_nome: somenteTexto(formData.tit_nome),
+          tit_cpf: somenteTexto(formData.tit_cpf),
+          tit_nasc: formatarData(formData.tit_nasc),
+          tit_email: somenteTexto(formData.tit_email),
+          tit_tel: somenteTexto(formData.tit_tel),
           cod_plano: 'p1140',
           tipo_plano: '1140',
           status_titular: 'inativo',
@@ -62,17 +74,21 @@ export function FormFamiliar() {
       cod_colab: codColab,
       cod_plano: 'p1140',
       tipo_plano: '1140',
-      assoc_nome: formData.assoc_nome,
-      assoc_cpf: formData.assoc_cpf,
-      assoc_nasc: formData.assoc_nasc,
-      assoc_email: formData.assoc_email,
-      assoc_tel: formData.assoc_tel,
+      
+      assoc_nome: somenteTexto(formData.assoc_nome),
+      assoc_cpf: somenteTexto(formData.assoc_cpf),
+      assoc_nasc: formatarData(formData.assoc_nasc),
+      assoc_email: somenteTexto(formData.assoc_email),
+      assoc_tel: somenteTexto(formData.assoc_tel),
+      
       tit_ind: 0,
       tit_fam: totalTitulares,
       tit_total: totalTitulares,
+      
       vl_ind: 0,
       vl_fam: 66 * totalTitulares,
       vl_total: 66 * totalTitulares,
+      
       status_venda: 'pendente',
       titulares: [titular],
     };
@@ -95,6 +111,7 @@ export function FormFamiliar() {
 
   return (
     <main className="min-h-screen bg-slate-50 py-12 px-4">
+      {/* ... mantive a estrutura visual idêntica à original ... */}
       <div className="max-w-xl mx-auto mb-4">
         <button type="button" onClick={() => window.location.href = '/'} className="text-sm font-bold text-blue-600 hover:text-blue-800">
           ← Voltar e revisar os planos
