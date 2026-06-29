@@ -34,6 +34,18 @@ export function FormColetivo() {
   const precoFam = totalTitulares >= 10 ? 60 : 66;
   const vlTotal = qtdInd * precoInd + qtdFam * precoFam;
 
+  // Função para formatar a data de aaaa-mm-dd para dd-mm-aaaa
+  function formatarData(data: string) {
+    if (!data) return '';
+    const [ano, mes, dia] = data.split('-');
+    return `${dia}-${mes}-${ano}`;
+  }
+
+  // Função para limpar espaços em branco
+  function somenteTexto(value: string) {
+    return String(value || '').trim();
+  }
+
   function handleChange(e: React.ChangeEvent<HTMLInputElement>) {
     const { name, value } = e.target;
     setFormData((prev) => ({ ...prev, [name]: value }));
@@ -90,11 +102,11 @@ export function FormColetivo() {
     const codColab = localStorage.getItem('referenciador_id') || '0001';
 
     const titularesPayload = titulares.map((titular) => ({
-      tit_nome: titular.tit_nome,
-      tit_cpf: titular.tit_cpf,
-      tit_nasc: titular.tit_nasc,
-      tit_email: titular.tit_email,
-      tit_tel: titular.tit_tel,
+      tit_nome: somenteTexto(titular.tit_nome),
+      tit_cpf: somenteTexto(titular.tit_cpf),
+      tit_nasc: formatarData(titular.tit_nasc),
+      tit_email: somenteTexto(titular.tit_email),
+      tit_tel: somenteTexto(titular.tit_tel),
       cod_plano: titular.tipo === 'individual' ? 'c1138' : 'c1140',
       tipo_plano: titular.tipo === 'individual' ? '1138' : '1140',
       tipo_titular: titular.tipo,
@@ -107,17 +119,21 @@ export function FormColetivo() {
       cod_colab: codColab,
       cod_plano: 'coletivo',
       tipo_plano: 'coletivo',
-      assoc_nome: formData.assoc_nome,
-      assoc_cpf: formData.assoc_cpf,
-      assoc_nasc: formData.assoc_nasc,
-      assoc_email: formData.assoc_email,
-      assoc_tel: formData.assoc_tel,
+      
+      assoc_nome: somenteTexto(formData.assoc_nome),
+      assoc_cpf: somenteTexto(formData.assoc_cpf),
+      assoc_nasc: formatarData(formData.assoc_nasc),
+      assoc_email: somenteTexto(formData.assoc_email),
+      assoc_tel: somenteTexto(formData.assoc_tel),
+      
       tit_ind: qtdInd,
       tit_fam: qtdFam,
       tit_total: totalTitulares,
+      
       vl_ind: precoInd,
       vl_fam: precoFam,
       vl_total: vlTotal,
+      
       status_venda: 'pendente',
       titulares: titularesPayload,
     };
@@ -142,11 +158,7 @@ export function FormColetivo() {
   return (
     <main className="min-h-screen bg-slate-50 py-12 px-4">
       <div className="max-w-3xl mx-auto mb-4">
-        <button
-          type="button"
-          onClick={() => window.location.href = '/'}
-          className="text-sm font-bold text-blue-600 hover:text-blue-800"
-        >
+        <button type="button" onClick={() => window.location.href = '/'} className="text-sm font-bold text-blue-600 hover:text-blue-800">
           ← Voltar e revisar os planos
         </button>
       </div>

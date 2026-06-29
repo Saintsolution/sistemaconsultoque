@@ -1,7 +1,3 @@
-import { HeaderVisual } from '../components/HeaderVisual';
-import { Hero } from '../components/Hero';
-import { Problem } from '../components/Problem';
-import { Telemedicine } from '../components/Telemedicine';
 import { PlanGrid } from '../components/PlanGrid';
 import { Benefits } from '../components/Benefits';
 import { ClubBenefits } from '../components/ClubBenefits';
@@ -25,6 +21,7 @@ export function Home() {
 
         <Benefits />
         <ClubBenefits />
+          <PlanGrid />
         <LegalCompliance />
         <AffiliateCall />
       </main>
@@ -32,4 +29,7 @@ export function Home() {
       <Footer />
     </div>
   );
-}
+}import { HeaderVisual } from '../components/HeaderVisual';
+import { Hero } from '../components/Hero';
+import { Problem } from '../components/Problem';
+import { Telemedicine } from '../components/Telemedicine';

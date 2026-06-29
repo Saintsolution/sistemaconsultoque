@@ -11,10 +11,9 @@ export function ClubBenefits() {
   ];
 
   return (
-    // py-16 reduzido para py-8 para eliminar o respiro excessivo
-    <section className="bg-white py-8">
+    <section id="club-benefits" className="bg-white py-8">
       <div className="max-w-3xl mx-auto px-6">
-        {/* Cabeçalho com mb-6 (era 10) */}
+        {/* Cabeçalho */}
         <div className="text-center mb-6">
           <div className="inline-flex items-center gap-2 bg-blue-50 text-blue-700 px-4 py-1.5 rounded-full text-xs font-black uppercase tracking-widest mb-3">
             <Gift className="w-4 h-4" /> Clube de Vantagens
@@ -24,7 +23,7 @@ export function ClubBenefits() {
           </h2>
         </div>
 
-        {/* Lista de Benefícios com padding interno ajustado */}
+        {/* Lista de Benefícios */}
         <div className="bg-slate-50 border border-gray-100 p-6 rounded-3xl shadow-sm">
           <div className="grid md:grid-cols-2 gap-3">
             {benefitsList.map((item, index) => (
@@ -36,7 +35,6 @@ export function ClubBenefits() {
           </div>
         </div>
 
-        {/* mt-8 reduzido para mt-6 */}
         <p className="text-center text-xs text-gray-400 font-medium mt-6">
           Acesso liberado imediatamente após a ativação do seu plano.
         </p>

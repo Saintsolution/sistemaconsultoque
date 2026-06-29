@@ -22,15 +22,16 @@ export function Footer() {
             <p className="text-sm text-gray-400 max-w-[200px]">Telemedicina e vantagens para toda família.</p>
           </div>
 
-          {/* Serviços */}
-          <div>
-            <h3 className="text-white font-semibold mb-4 text-base">Serviços</h3>
-            <ul className="space-y-2 text-sm">
-              <li><a href="/#hero" className="hover:text-blue-400 transition-colors">Telemedicina</a></li>
-              <li><a href="/#club-benefits" className="hover:text-blue-400 transition-colors">Vantagens</a></li>
-              <li><Link to="/seja-afiliado" className="hover:text-blue-400 transition-colors font-bold text-blue-300">Quero ser Colaborador</Link></li>
-            </ul>
-          </div>
+         {/* Serviços */}
+<div>
+  <h3 className="text-white font-semibold mb-4 text-base">Serviços</h3>
+  <ul className="space-y-2 text-sm">
+    <li><a href="/#hero" className="hover:text-blue-400 transition-colors">Telemedicina</a></li>
+    {/* Alteração feita na linha abaixo: */}
+    <li><a href="/#club-benefits" className="hover:text-blue-400 transition-colors">Vantagens</a></li>
+    <li><Link to="/seja-afiliado" className="hover:text-blue-400 transition-colors font-bold text-blue-300">Quero ser Colaborador</Link></li>
+  </ul>
+</div>
 
           {/* Institucional */}
           <div>
