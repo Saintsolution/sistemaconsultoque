@@ -107,8 +107,8 @@ export function FormColetivo() {
       tit_nasc: formatarData(titular.tit_nasc),
       tit_email: somenteTexto(titular.tit_email),
       tit_tel: somenteTexto(titular.tit_tel),
-      cod_plano: titular.tipo === 'individual' ? 'c1138' : 'c1140',
-      tipo_plano: titular.tipo === 'individual' ? '1138' : '1140',
+      cod_plano: titular.tipo === 'individual' ? 'c1380' : 'c1382',
+      tipo_plano: titular.tipo === 'individual' ? '1380' : '1382',
       tipo_titular: titular.tipo,
       status_titular: 'inativo',
     }));

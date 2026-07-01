@@ -10,6 +10,13 @@ export function FormIndividual() {
   const [mostrarTermos, setMostrarTermos] = useState(false);
   const [termosAceitos, setTermosAceitos] = useState(false);
 
+  const [dadosPagamento, setDadosPagamento] = useState({
+    message: '',
+    url_pagamento: '',
+    dt_vencimento: '',
+    dia_vencimento: '',
+  });
+
   const [formData, setFormData] = useState({
     assoc_nome: '',
     assoc_cpf: '',
@@ -58,8 +65,8 @@ export function FormIndividual() {
           tit_nasc: formatarData(formData.assoc_nasc),
           tit_email: somenteTexto(formData.assoc_email),
           tit_tel: somenteTexto(formData.assoc_tel),
-          cod_plano: 'p1138',
-          tipo_plano: '1138',
+          cod_plano: 'p1380',
+          tipo_plano: '1380',
           status_titular: 'inativo',
         }
       : {
@@ -68,8 +75,8 @@ export function FormIndividual() {
           tit_nasc: formatarData(formData.tit_nasc),
           tit_email: somenteTexto(formData.tit_email),
           tit_tel: somenteTexto(formData.tit_tel),
-          cod_plano: 'p1138',
-          tipo_plano: '1138',
+          cod_plano: 'p1380',
+          tipo_plano: '1380',
           status_titular: 'inativo',
         };
 
@@ -79,8 +86,8 @@ export function FormIndividual() {
       origem: 'site_consultoque',
       origem_form: 'individual',
       cod_colab: codColab,
-      cod_plano: 'p1138',
-      tipo_plano: '1138',
+      cod_plano: 'p1380',
+      tipo_plano: '1380',
 
       assoc_nome: somenteTexto(formData.assoc_nome),
       assoc_cpf: somenteTexto(formData.assoc_cpf),
@@ -113,6 +120,15 @@ export function FormIndividual() {
 
       if (!response.ok) throw new Error('Erro ao enviar cadastro.');
 
+      const data = await response.json();
+
+      setDadosPagamento({
+        message: data.message || 'Boleto emitido com sucesso. Enviamos também o link para seu e-mail.',
+        url_pagamento: data.url_pagamento || data.invoiceUrl || '',
+        dt_vencimento: data.dt_vencimento || data.dueDate || '',
+        dia_vencimento: data.dia_vencimento || '',
+      });
+
       setMostrarTermos(false);
       setSucesso(true);
     } catch (error) {
@@ -141,9 +157,34 @@ export function FormIndividual() {
             <h2 className="text-3xl font-black text-green-600 mb-4">
               Boleto emitido!
             </h2>
-            <p className="text-lg text-gray-700">
-              Verifique seu e-mail. Enviamos o link para acessar o pagamento da sua mensalidade.
+
+            <p className="text-lg text-gray-700 mb-4">
+              {dadosPagamento.message || 'Verifique seu e-mail. Enviamos o link para pagamento.'}
             </p>
+
+            {dadosPagamento.dt_vencimento && (
+              <p className="text-gray-700 mb-2">
+                Vencimento do boleto: <strong>{dadosPagamento.dt_vencimento}</strong>
+              </p>
+            )}
+
+            {dadosPagamento.dia_vencimento && (
+              <p className="text-gray-700 mb-6">
+                As próximas mensalidades vencerão sempre no dia{' '}
+                <strong>{dadosPagamento.dia_vencimento}</strong>.
+              </p>
+            )}
+
+            {dadosPagamento.url_pagamento && (
+              <a
+                href={dadosPagamento.url_pagamento}
+                target="_blank"
+                rel="noreferrer"
+                className="inline-block bg-[#22C55E] hover:bg-[#16a34a] text-white font-black px-6 py-4 rounded-2xl uppercase"
+              >
+                Abrir boleto agora
+              </a>
+            )}
           </div>
         ) : (
           <>
