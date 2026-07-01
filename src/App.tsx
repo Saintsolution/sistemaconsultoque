@@ -20,6 +20,10 @@ import { FAQ } from './pages/FAQ';
 import { Termos } from './pages/Termos';
 import { Privacidade } from './pages/Privacidade';
 
+// Novos imports
+import { LoginAssociado } from './pages/LoginAssociado';
+import { DashboardAssociado } from './pages/DashboardAssociado';
+
 export default function App() {
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -42,6 +46,8 @@ export default function App() {
       'form-coletivo',
       'inscricao-colaborador',
       'videoafiliados',
+      'login-associado',
+      'dashboard-associado'
     ];
 
     const isRefPath =
@@ -71,6 +77,9 @@ export default function App() {
         <Route path="/form-coletivo" element={<FormColetivo />} />
 
         <Route path="/login" element={<Login />} />
+        <Route path="/login-associado" element={<LoginAssociado />} />
+        <Route path="/dashboard-associado" element={<DashboardAssociado />} />
+        
         <Route path="/admin" element={<AdminAsaas />} />
         <Route path="/colaborador" element={<ColaboradorDashboard />} />
         <Route path="/empresa" element={<EmpresaDashboard />} />
